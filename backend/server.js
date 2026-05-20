@@ -13,7 +13,7 @@ const app = express();
 app.use(cors({
 	origin: [
 		"http://localhost:5173",
-		"https://newnop-assignment.vercel.app/api",
+		"https://newnop-assignment.vercel.app",
 	],
 	credentials: true
 }))
