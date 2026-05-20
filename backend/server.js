@@ -11,7 +11,10 @@ const app = express();
 
 // CORS configuration
 app.use(cors({
-	origin:"https://newnop-assignment-5rmz.vercel.app",
+	origin: [
+		"https://newnop-assignment-5rmz.vercel.app",
+		"http://localhost:5173"
+	],
 	credentials: true
 }))
 
