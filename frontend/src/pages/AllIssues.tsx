@@ -1,5 +1,6 @@
 import { useEffect, useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import { issueAPI } from '../api/Issue-api.ts';
 import ViewIssue from '../components/view/ViewIssue.tsx';
 
@@ -7,14 +8,15 @@ import Pagination from '../components/Pagination';
 
 import SearchFilters from '../components/filter/SearchFilters.tsx';
 import type { Issue } from '../types/issue.types';
-import { 
-  getStatusBadge, 
-  getPriorityBadge, 
-  getSeverityIcon, 
-  formatDate, 
+import {
+  getStatusBadge,
+  getPriorityBadge,
+  getSeverityIcon,
+  formatDate,
   calculateStatusCounts,
-  filterIssues 
+  filterIssues
 } from '../utils/issueHelpers';
+import { exportIssuesToCSV } from '../utils/csvExport';
 import StatusCards from '../components/view/StatusCards.tsx';
 import CreateIssue from '../components/form/CreateIssue.tsx';
 
@@ -50,7 +52,7 @@ const AllIssues = () => {
     setLoading(true);
     setError('');
     const result = await issueAPI.getAllIssues();
-    
+
     if (result.success && result.data) {
       setIssues(result.data);
     } else {
@@ -90,6 +92,21 @@ const AllIssues = () => {
     setSeverityFilter('All');
   }, []);
 
+  // Handle CSV export
+  const handleExportToCSV = useCallback(() => {
+    try {
+      if (issues.length === 0) {
+        toast.warning('No issues to export');
+        return;
+      }
+      exportIssuesToCSV(issues, 'all-issues-export');
+      toast.success('All issues exported to CSV successfully!');
+    } catch (error) {
+      toast.error('Failed to export issues to CSV');
+      console.error('CSV Export Error:', error);
+    }
+  }, [issues]);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
@@ -117,6 +134,16 @@ const AllIssues = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
               </svg>
               My Issues
+            </button>
+            <button
+              onClick={handleExportToCSV}
+              className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white text-lg font-bold rounded-xl hover:from-green-700 hover:to-green-800 shadow-lg hover:shadow-xl transition-all duration-200"
+              title="Export All Issues to CSV"
+            >
+              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+              </svg>
+              Export CSV
             </button>
           </div>
         </div>
@@ -176,8 +203,8 @@ const AllIssues = () => {
                 </svg>
                 <h3 className="text-xl font-semibold text-gray-700 mb-2">No Issues Found</h3>
                 <p className="text-gray-500">
-                  {issues.length === 0 
-                    ? 'There are no issues to display at this time.' 
+                  {issues.length === 0
+                    ? 'There are no issues to display at this time.'
                     : 'No issues match your current filters. Try adjusting your search or filters.'}
                 </p>
                 {issues.length > 0 && (
@@ -193,7 +220,7 @@ const AllIssues = () => {
               <div className="space-y-5">
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-2xl font-bold text-gray-800">
-                    {filteredIssues.length === issues.length 
+                    {filteredIssues.length === issues.length
                       ? `All Issues (${issues.length})`
                       : `Filtered Issues (${filteredIssues.length}/${issues.length})`}
                   </h2>
@@ -225,7 +252,7 @@ const AllIssues = () => {
                             <span className="w-2 h-2 rounded-full bg-current mr-2"></span>
                             {issue.status}
                           </span>
-                          
+
                           <span className={`inline-flex items-center px-4 py-2 rounded-lg text-sm font-semibold border-2 ${getPriorityBadge(issue.priority)}`}>
                             <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
                               <path fillRule="evenodd" d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12A3 3 0 017 13s.879.5 2.5.5c0-1 .5-4 1.25-4.5.5 1 .786 1.293 1.371 1.879A2.99 2.99 0 0113 13a2.99 2.99 0 01-.879 2.121z" clipRule="evenodd" />
@@ -251,7 +278,7 @@ const AllIssues = () => {
                           {formatDate(issue.createdAt)}
                         </div>
 
-                        <button 
+                        <button
                           onClick={() => setSelectedIssueId(issue._id)}
                           className="inline-flex items-center px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-700 text-white text-sm font-semibold rounded-lg hover:from-indigo-700 hover:to-indigo-800 shadow-md hover:shadow-lg transition-all duration-200"
                         >
@@ -280,9 +307,9 @@ const AllIssues = () => {
 
         {/* View Issue Modal */}
         {selectedIssueId && (
-          <ViewIssue 
-            issueId={selectedIssueId} 
-            onClose={() => setSelectedIssueId(null)} 
+          <ViewIssue
+            issueId={selectedIssueId}
+            onClose={() => setSelectedIssueId(null)}
           />
         )}
 
