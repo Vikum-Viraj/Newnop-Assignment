@@ -4,7 +4,7 @@ import { authMiddleware } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-// Protected routes - require authentication
+// Protected routes
 router.get("/", authMiddleware, getAllIssues);
 router.get("/user/my-issues", authMiddleware, getUserIssues);
 router.get("/:id", authMiddleware, getIssueById);

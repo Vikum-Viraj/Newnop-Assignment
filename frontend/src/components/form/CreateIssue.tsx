@@ -38,7 +38,7 @@ const CreateIssue: React.FC<CreateIssueProps> = ({ onClose, onCreate }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" onClick={onClose}>
-      <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-white rounded-lg max-w-2xl w-full max-h-[100vh]" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
         <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
           <h2 className="text-xl font-bold text-gray-900">Create New Issue</h2>
