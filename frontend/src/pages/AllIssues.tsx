@@ -97,7 +97,7 @@ const AllIssues = () => {
         <div className="mb-8 flex justify-between items-center">
           <div>
             <h1 className="text-4xl font-bold text-gray-900 mb-2">All Issues</h1>
-            <p className="text-gray-600 text-lg">Complete overview of all tracked issues</p>
+            <p className="text-gray-600 text-lg">Overview of all tracked issues</p>
           </div>
           <div className="flex items-center gap-3">
             <button
